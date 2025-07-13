@@ -1,7 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:sign_in_with_apple/sign_in_with_apple.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
 
 void main() {
   runApp(const MyApp());
@@ -13,65 +10,55 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Apple Login Demo',
+      title: 'Cherrypic App',
       theme: ThemeData(
-        primarySwatch: Colors.blue,
+        primarySwatch: Colors.pink,
       ),
-      home: const LoginPage(),
+      home: const MyHomePage(),
     );
   }
 }
 
-class LoginPage extends StatelessWidget {
-  const LoginPage({super.key});
+class MyHomePage extends StatefulWidget {
+  const MyHomePage({super.key});
 
-  Future<void> signInWithApple() async {
-    try {
-      final credential = await SignInWithApple.getAppleIDCredential(
-        scopes: [
-          AppleIDAuthorizationScopes.email,
-          AppleIDAuthorizationScopes.fullName,
-        ],
-      );
+  @override
+  State<MyHomePage> createState() => _MyHomePageState();
+}
 
-      final idToken = credential.identityToken;
+class _MyHomePageState extends State<MyHomePage> {
+  int _counter = 0;
 
-      if (idToken == null) {
-        throw Exception("ID Token is null");
-      }
-
-      // ✅ API 요청
-      final response = await http.post(
-        Uri.parse('https://dev-api.cherry-pick.today/auth/social-login'),
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: jsonEncode({
-          'oauthProvider': 'APPLE',
-          'idToken': idToken,
-        }),
-      );
-
-      if (response.statusCode == 200 || response.statusCode == 204) {
-        debugPrint('로그인 성공: ${response.statusCode}');
-      } else {
-        debugPrint('로그인 실패: ${response.statusCode}, ${response.body}');
-      }
-    } catch (e) {
-      debugPrint('Apple 로그인 에러: $e');
-    }
+  void _incrementCounter() {
+    setState(() {
+      _counter++;
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Apple Login"),
+        title: const Text('Cherrypic'),
       ),
       body: Center(
-        child: SignInWithAppleButton(
-          onPressed: signInWithApple,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            const Text(
+              'You have pushed the button this many times:',
+            ),
+            Text(
+              '$_counter',
+              style: Theme.of(context).textTheme.headlineMedium,
+            ),
+          ],
         ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: _incrementCounter,
+        tooltip: 'Increment',
+        child: const Icon(Icons.add),
       ),
     );
   }
